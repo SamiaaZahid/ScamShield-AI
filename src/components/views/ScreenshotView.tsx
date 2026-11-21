@@ -5,15 +5,11 @@ import { translations } from '../../utils/i18n';
 import { ThreatReportCard } from '../common/ThreatReportCard';
 import { 
   Upload, 
-  Image as ImageIcon, 
   Trash2, 
   ScanEye, 
   AlertCircle, 
-  CheckCircle2, 
-  FileText, 
   Radio, 
-  Info,
-  ShieldAlert
+  Info
 } from 'lucide-react';
 
 interface ScreenshotViewProps {
@@ -114,7 +110,6 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Helper to load sample test screenshots using canvas generator
   const loadDemoScreenshot = (scenario: 'bank' | 'job') => {
     const canvas = document.createElement('canvas');
     canvas.width = 600;
@@ -122,11 +117,9 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Dark sleek mobile SMS preview background
     ctx.fillStyle = '#0F172A';
     ctx.fillRect(0, 0, 600, 360);
 
-    // Header bar
     ctx.fillStyle = '#1E293B';
     ctx.fillRect(0, 0, 600, 60);
 
@@ -134,7 +127,6 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
     ctx.font = 'bold 16px sans-serif';
     ctx.fillText(scenario === 'bank' ? 'SMS: +92-300-8849201 (HBL Bank Alert)' : 'Telegram: HR_Recruiter_Official', 24, 38);
 
-    // Message bubble
     ctx.fillStyle = '#1E293B';
     ctx.beginPath();
     ctx.roundRect(24, 85, 552, 230, 12);
@@ -174,9 +166,9 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
     <div className="space-y-8 animate-fade-in">
       {/* Banner if no cloud key */}
       {!hasCloudKey && (
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start justify-between gap-4 transition-all duration-200 hover:border-amber-400/50">
+          <div className="flex items-start gap-3 group">
+            <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(245,158,11,0.65)]" />
             <div className="text-xs text-slate-300">
               <span className="font-bold text-white block">
                 {language === 'ur-roman' ? 'Firebase AI Key Zaroori Hai' : 'Firebase AI Logic Required for Vision Forensics'}
@@ -190,7 +182,7 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
           </div>
           <button
             onClick={onNavigateToSettings}
-            className="text-xs font-mono font-semibold text-cyan-400 hover:text-cyan-300 underline shrink-0"
+            className="text-xs font-mono font-semibold text-cyan-400 hover:text-cyan-300 underline shrink-0 transition-all duration-200 hover:scale-105 cursor-pointer"
           >
             {t.navSettings}
           </button>
@@ -198,10 +190,10 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
       )}
 
       {/* Upload Box Card */}
-      <div className="glass-panel rounded-2xl p-6 border border-slate-800 shadow-2xl space-y-6">
-        <div>
+      <div className="glass-panel rounded-2xl p-6 border border-slate-800 shadow-2xl space-y-6 transition-all duration-300 hover:border-slate-700">
+        <div className="group cursor-default">
           <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-            <ScanEye className="w-5 h-5 text-cyan-400" />
+            <ScanEye className="w-5 h-5 text-cyan-400 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)]" />
             <span>{t.screenshotTitle}</span>
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -215,7 +207,7 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-slate-700 hover:border-cyan-400/60 rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all bg-slate-900/40 hover:bg-slate-900/70 group"
+            className="border-2 border-dashed border-slate-700 hover:border-cyan-400/60 rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 bg-slate-900/40 hover:bg-slate-900/70 hover:shadow-[0_0_20px_rgba(34,211,238,0.12)] group"
           >
             <input
               type="file"
@@ -224,10 +216,10 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
               accept="image/png, image/jpeg, image/jpg, image/webp"
               className="hidden"
             />
-            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center group-hover:scale-105 transition mb-4">
-              <Upload className="w-8 h-8" />
+            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_14px_rgba(34,211,238,0.65)] group-hover:border-cyan-400/50 mb-4">
+              <Upload className="w-8 h-8 transition-transform duration-200 group-hover:-translate-y-0.5" />
             </div>
-            <p className="text-sm font-semibold text-slate-200 text-center">
+            <p className="text-sm font-semibold text-slate-200 text-center transition-colors group-hover:text-cyan-300">
               {t.dropImageHere}
             </p>
             <p className="text-xs text-slate-500 mt-1">
@@ -242,14 +234,14 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
               <button
                 type="button"
                 onClick={() => loadDemoScreenshot('bank')}
-                className="px-3 py-1 rounded-lg text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700"
+                className="px-3 py-1 rounded-lg text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 hover:border-cyan-400/50 hover:shadow-[0_0_10px_rgba(34,211,238,0.25)] transition-all duration-200 hover:scale-105 active:scale-98 cursor-pointer"
               >
                 Simulated Bank SMS
               </button>
               <button
                 type="button"
                 onClick={() => loadDemoScreenshot('job')}
-                className="px-3 py-1 rounded-lg text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700"
+                className="px-3 py-1 rounded-lg text-xs font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 hover:border-cyan-400/50 hover:shadow-[0_0_10px_rgba(34,211,238,0.25)] transition-all duration-200 hover:scale-105 active:scale-98 cursor-pointer"
               >
                 Simulated Job Offer
               </button>
@@ -258,7 +250,7 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
         ) : (
           /* Image Selected Preview */
           <div className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-950 p-2 flex flex-col items-center justify-center max-h-[420px]">
+            <div className="relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-950 p-2 flex flex-col items-center justify-center max-h-[420px] transition-all duration-300 hover:border-cyan-500/40 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)] group">
               <img
                 src={selectedImage}
                 alt="Selected Screenshot"
@@ -266,10 +258,10 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
               />
               <button
                 onClick={handleRemoveImage}
-                className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900/90 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 transition"
+                className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900/90 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 hover:border-red-500/40 transition-all duration-200 hover:scale-110 hover:shadow-[0_0_12px_rgba(239,68,68,0.4)] cursor-pointer group/del"
                 title={t.removeImage}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 transition-all duration-200 group-hover/del:scale-110 group-hover/del:drop-shadow-[0_0_10px_rgba(239,68,68,0.65)]" />
               </button>
             </div>
 
@@ -283,7 +275,7 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
                 value={contextText}
                 onChange={(e) => setContextText(e.target.value)}
                 placeholder={language === 'ur-roman' ? 'Maslan: Yeh WhatsApp par anjan number se aya...' : 'e.g. Received via WhatsApp from unfamiliar international number...'}
-                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none transition"
+                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:shadow-[0_0_14px_rgba(34,211,238,0.2)]"
               />
             </div>
           </div>
@@ -291,8 +283,8 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
 
         {/* Error Notification */}
         {errorMsg && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-xs text-red-400">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-xs text-red-400 animate-fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 transition-transform duration-200 hover:scale-110" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -306,7 +298,7 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
             <button
               onClick={handleAnalyze}
               disabled={isScanning}
-              className="px-6 py-3 rounded-xl text-xs font-semibold text-slate-900 bg-cyan-400 hover:bg-cyan-300 shadow-lg shadow-cyan-400/20 transition flex items-center gap-2 cursor-pointer"
+              className="px-6 py-3 rounded-xl text-xs font-semibold text-slate-900 bg-cyan-400 hover:bg-cyan-300 shadow-lg shadow-cyan-400/20 transition-all duration-200 hover:scale-105 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] active:scale-98 flex items-center gap-2 cursor-pointer group"
             >
               {isScanning ? (
                 <>
@@ -315,7 +307,7 @@ export const ScreenshotView: React.FC<ScreenshotViewProps> = ({
                 </>
               ) : (
                 <>
-                  <ScanEye className="w-4 h-4" />
+                  <ScanEye className="w-4 h-4 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(11,16,32,0.6)]" />
                   <span>{t.analyzeScreenshotBtn}</span>
                 </>
               )}

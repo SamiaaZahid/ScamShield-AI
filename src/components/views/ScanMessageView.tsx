@@ -8,12 +8,8 @@ import {
   Search, 
   Trash2, 
   Clipboard, 
-  Sparkles, 
   AlertCircle, 
-  Zap, 
   Radio, 
-  Layers,
-  ArrowRight,
   Info
 } from 'lucide-react';
 
@@ -40,7 +36,6 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
   const [currentResult, setCurrentResult] = useState<ScanResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // When initialText changes from quick scan, set it
   React.useEffect(() => {
     if (initialText) {
       setInputText(initialText);
@@ -107,9 +102,9 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
     <div className="space-y-8 animate-fade-in">
       {/* Banner Notice if no cloud key configured */}
       {!hasCloudKey && (
-        <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-start justify-between gap-4 transition-all duration-200 hover:border-blue-400/50">
+          <div className="flex items-start gap-3 group">
+            <Info className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)]" />
             <div className="text-xs text-slate-300">
               <span className="font-bold text-white block">
                 {language === 'ur-roman' ? 'Local Heuristics Engine Fa\'al Hai' : 'Local Heuristics Mode Active'}
@@ -123,7 +118,7 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
           </div>
           <button
             onClick={onNavigateToSettings}
-            className="text-xs font-mono font-semibold text-cyan-400 hover:text-cyan-300 underline shrink-0"
+            className="text-xs font-mono font-semibold text-cyan-400 hover:text-cyan-300 underline shrink-0 transition-all duration-200 hover:scale-105 cursor-pointer"
           >
             {t.navSettings}
           </button>
@@ -131,11 +126,11 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
       )}
 
       {/* Main Input Card */}
-      <div className="glass-panel rounded-2xl p-6 border border-slate-800 shadow-2xl space-y-5">
+      <div className="glass-panel rounded-2xl p-6 border border-slate-800 shadow-2xl space-y-5 transition-all duration-300 hover:border-slate-700">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
+          <div className="group cursor-default">
             <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-cyan-400" />
+              <ShieldAlert className="w-5 h-5 text-cyan-400 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)]" />
               <span>{t.scanMessageTitle}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -145,15 +140,15 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
 
           <button
             onClick={handlePaste}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition-all duration-200 hover:scale-105 hover:border-cyan-400/50 hover:shadow-[0_0_12px_rgba(34,211,238,0.35)] cursor-pointer group"
           >
-            <Clipboard className="w-3.5 h-3.5 text-cyan-400" />
+            <Clipboard className="w-3.5 h-3.5 text-cyan-400 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)]" />
             <span>{t.pasteFromClipboard}</span>
           </button>
         </div>
 
         {/* Textarea */}
-        <div className="relative">
+        <div className="relative group">
           <textarea
             rows={5}
             value={inputText}
@@ -162,7 +157,7 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
               if (errorMsg) setErrorMsg(null);
             }}
             placeholder={t.enterMessagePlaceholder}
-            className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl p-4 text-sm text-slate-100 placeholder-slate-500 outline-none transition font-sans resize-y leading-relaxed"
+            className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl p-4 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:shadow-[0_0_15px_rgba(34,211,238,0.2)] font-sans resize-y leading-relaxed"
           />
           {inputText && (
             <button
@@ -170,18 +165,18 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
                 setInputText('');
                 setCurrentResult(null);
               }}
-              className="absolute right-3 bottom-3 p-1.5 text-slate-500 hover:text-red-400 rounded-lg hover:bg-slate-800/80 transition"
+              className="absolute right-3 bottom-3 p-1.5 text-slate-500 hover:text-red-400 rounded-lg hover:bg-slate-800/80 transition-all duration-200 hover:scale-110 group cursor-pointer"
               title={t.clearBtn}
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(239,68,68,0.65)]" />
             </button>
           )}
         </div>
 
         {/* Error message */}
         {errorMsg && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-xs text-red-400">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2 text-xs text-red-400 animate-fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 transition-transform duration-200 hover:scale-110" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -200,7 +195,7 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
                   setCurrentResult(null);
                   setErrorMsg(null);
                 }}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700 transition"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-cyan-400/50 hover:shadow-[0_0_10px_rgba(34,211,238,0.2)] transition-all duration-200 hover:scale-105 active:scale-98 cursor-pointer"
               >
                 {sample.label}
               </button>
@@ -212,17 +207,20 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
         <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
           <div className="text-xs text-slate-500 font-mono">
             {settings.privacyPreMasking && (
-              <span className="text-teal-400">Client-Side PII Masking: Active</span>
+              <span className="text-teal-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+                Client-Side PII Masking: Active
+              </span>
             )}
           </div>
 
           <button
             onClick={handleAnalyze}
             disabled={isScanning || !inputText.trim()}
-            className={`px-6 py-3 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg transition-all ${
+            className={`px-6 py-3 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg transition-all duration-200 group ${
               isScanning || !inputText.trim()
                 ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                : 'text-slate-900 bg-cyan-400 hover:bg-cyan-300 shadow-cyan-400/20 hover:shadow-cyan-400/40 cursor-pointer'
+                : 'text-slate-900 bg-cyan-400 hover:bg-cyan-300 shadow-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] hover:scale-105 active:scale-98 cursor-pointer'
             }`}
           >
             {isScanning ? (
@@ -232,7 +230,7 @@ export const ScanMessageView: React.FC<ScanMessageViewProps> = ({
               </>
             ) : (
               <>
-                <Search className="w-4 h-4" />
+                <Search className="w-4 h-4 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(11,16,32,0.6)]" />
                 <span>{t.analyzeNowBtn}</span>
               </>
             )}

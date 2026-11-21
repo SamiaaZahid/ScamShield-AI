@@ -7,9 +7,7 @@ import {
   BookOpen, 
   Settings, 
   ShieldCheck, 
-  Zap, 
-  ShieldAlert,
-  SlidersHorizontal
+  Zap
 } from 'lucide-react';
 import type { Language } from '../../utils/i18n';
 import { translations } from '../../utils/i18n';
@@ -77,9 +75,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Top Branding */}
       <div>
         <div className="p-5 border-b border-slate-800/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-violet-600 p-0.5 shadow-lg shadow-cyan-500/20 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-violet-600 p-0.5 shadow-lg shadow-cyan-500/20 flex items-center justify-center transition-all duration-300 hover:scale-105 hover:drop-shadow-[0_0_12px_rgba(34,211,238,0.65)] group cursor-pointer">
             <div className="w-full h-full bg-[#0B1020] rounded-[10px] flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-cyan-400" />
+              <ShieldCheck className="w-5 h-5 text-cyan-400 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)]" />
             </div>
           </div>
           <div>
@@ -111,10 +109,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all group relative ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group relative ${
                   isActive
                     ? 'bg-gradient-to-r from-cyan-500/15 to-blue-600/15 text-white border border-cyan-500/30 shadow-lg shadow-cyan-500/5 font-semibold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent hover:border-slate-800/80'
                 }`}
               >
                 {isActive && (
@@ -122,18 +120,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 )}
                 <div className="flex items-center gap-3">
                   <Icon
-                    className={`w-4 h-4 transition-colors ${
-                      isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'
+                    className={`w-4 h-4 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)] ${
+                      isActive ? 'text-cyan-400 drop-shadow-[0_0_6px_rgba(34,211,238,0.4)]' : 'text-slate-500 group-hover:text-cyan-400'
                     }`}
                   />
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (
                   <span
-                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase ${
+                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase transition-all duration-200 ${
                       isActive
-                        ? 'bg-cyan-400/20 text-cyan-300 border border-cyan-400/40'
-                        : 'bg-slate-800 text-slate-400'
+                        ? 'bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 shadow-[0_0_6px_rgba(34,211,238,0.25)]'
+                        : 'bg-slate-800 text-slate-400 group-hover:text-slate-200'
                     }`}
                   >
                     {item.badge}
@@ -148,13 +146,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Bottom Telemetry & Status Panel */}
       <div className="p-4 border-t border-slate-800/80 space-y-3">
         {/* Engine Status indicator */}
-        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+        <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2 group transition-all duration-200 hover:border-cyan-500/30 hover:shadow-[0_0_12px_rgba(34,211,238,0.1)]">
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-slate-400 font-mono flex items-center gap-1.5">
-              <Zap className="w-3 h-3 text-cyan-400" />
+              <Zap className="w-3 h-3 text-cyan-400 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.65)]" />
               {language === 'ur-roman' ? 'Inference Engine' : 'Inference Tier'}
             </span>
-            <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${
+            <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold transition-all duration-200 ${
               hasCloudKey 
                 ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' 
                 : 'bg-teal-500/20 text-teal-300 border border-teal-500/30'
@@ -178,8 +176,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Security Assurance footer */}
         <div className="flex items-center justify-between px-1 text-[10px] font-mono text-slate-500">
           <span>Zero-Trust Architecture</span>
-          <span className="text-teal-400 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+          <span className="text-teal-400 flex items-center gap-1 group cursor-default">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse transition-all duration-200 group-hover:scale-125 group-hover:shadow-[0_0_8px_#2DD4BF]" />
             Protected
           </span>
         </div>

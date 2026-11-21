@@ -57,11 +57,11 @@ body {
 }
 
 .glass-panel-hover {
-  transition: all 0.25s ease-in-out;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .glass-panel-hover:hover {
-  border-color: rgba(34, 211, 238, 0.35);
-  box-shadow: 0 0 25px rgba(34, 211, 238, 0.12);
+  border-color: rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.15);
   transform: translateY(-2px);
 }
 
@@ -69,6 +69,65 @@ body {
   background: rgba(18, 26, 48, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Global Icon Smooth Pop-up & Soft Cyan/Blue Glow */
+svg.lucide {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease-in-out, color 0.2s ease;
+  transform-origin: center;
+  display: inline-block;
+  will-change: transform, filter;
+}
+
+/* Direct Hover on any icon */
+svg.lucide:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.65));
+}
+
+/* Hover over parent buttons, links, or group items triggers icon pop-up & glow */
+button:hover svg.lucide,
+[role="button"]:hover svg.lucide,
+a:hover svg.lucide,
+.group:hover svg.lucide,
+.icon-trigger:hover svg.lucide {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.65));
+}
+
+/* Targeted Icon Button Hover Utility */
+.icon-btn-hover {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease-in-out, border-color 0.2s ease;
+}
+.icon-btn-hover:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
+  border-color: rgba(34, 211, 238, 0.5);
+}
+.icon-btn-hover:active {
+  transform: scale(0.97);
+}
+
+/* Action Button Glow Utility */
+.btn-cyber-glow {
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-cyber-glow:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.4);
+}
+.btn-cyber-glow:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Card Icon Container Pop Utility */
+.card-icon-container {
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.group:hover .card-icon-container {
+  transform: scale(1.1);
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.3);
+  border-color: rgba(34, 211, 238, 0.5);
 }
 
 /* Glow Utilities */
