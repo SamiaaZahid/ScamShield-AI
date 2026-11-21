@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { SettingsConfig } from '../../types';
 import type { Language } from '../../utils/i18n';
 import { translations } from '../../utils/i18n';
-import { testFirebaseConnection } from '../../services/firebaseAiEngine';
+import { testFirebaseConnection, type FirebaseConnectionStatus } from '../../services/firebaseAiEngine';
+import { checkChromeAiAvailability, type ChromeAiCapabilities } from '../../services/chromeAiEngine';
 import { 
   Settings, 
   Globe, 
@@ -13,7 +14,11 @@ import {
   Lock, 
   Eye, 
   EyeOff, 
-  Activity
+  Activity,
+  Cpu,
+  ShieldCheck,
+  ShieldAlert,
+  KeyRound
 } from 'lucide-react';
 
 interface SettingsViewProps {
@@ -33,10 +38,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   const [formData, setFormData] = useState<SettingsConfig>({ ...settings });
   const [showKey, setShowKey] = useState(false);
-  const [testStatus, setTestStatus] = useState<{ testing: boolean; success?: boolean; message?: string }>({
-    testing: false
-  });
+  const [testStatus, setTestStatus] = useState<FirebaseConnectionStatus | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [chromeAiStatus, setChromeAiStatus] = useState<ChromeAiCapabilities>({
+    available: false,
+    model: 'Checking...'
+  });
+
+  // Probe Chrome Built-in AI on mount
+  useEffect(() => {
+    checkChromeAiAvailability().then((status) => {
+      setChromeAiStatus(status);
+    });
+  }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,24 +61,38 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   const handleTestConnection = async () => {
-    const key = formData.geminiApiKey || formData.firebaseApiKey;
-    if (!key) {
+    const apiKey = formData.firebaseApiKey?.trim() || formData.geminiApiKey?.trim();
+    if (!apiKey) {
       setTestStatus({
-        testing: false,
         success: false,
-        message: language === 'ur-roman' ? 'Pehle API Key darj karein.' : 'Please enter an API Key to test.'
+        message: language === 'ur-roman' ? 'Pehle API Key darj karein.' : 'Please enter an API Key to test.',
+        appInitialized: false,
+        appCheckActive: false,
+        aiLogicActive: false
       });
       return;
     }
 
-    setTestStatus({ testing: true });
-    const res = await testFirebaseConnection(key);
-    setTestStatus({
-      testing: false,
-      success: res.success,
-      message: res.message
-    });
+    setIsTesting(true);
+    setTestStatus(null);
+
+    const creds = {
+      apiKey,
+      projectId: formData.firebaseProjectId,
+      appId: formData.firebaseAppId,
+      authDomain: formData.firebaseAuthDomain,
+      storageBucket: formData.firebaseStorageBucket,
+      messagingSenderId: formData.firebaseMessagingSenderId,
+      appCheckDebugToken: formData.firebaseAppCheckDebugToken
+    };
+
+    const res = await testFirebaseConnection(creds);
+    setTestStatus(res);
+    setIsTesting(false);
   };
+
+  const hasApiKey = !!(formData.firebaseApiKey?.trim() || formData.geminiApiKey?.trim());
+  const hasAppCheckToken = !!formData.firebaseAppCheckDebugToken?.trim();
 
   return (
     <div className="space-y-8 animate-fade-in max-w-4xl">
@@ -78,13 +107,98 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </p>
       </div>
 
+      {/* Live Hybrid Architecture Status Badges */}
+      <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-cyan-400" />
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+              {language === 'ur-roman' ? 'Inference Architecture Status' : 'Inference Pipeline & Security Health'}
+            </h4>
+          </div>
+          <span className="text-[10px] font-mono text-slate-400">
+            Real-time Telemetry
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Badge 1: On-Device AI */}
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5 transition-all duration-200 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+                On-Device AI
+              </span>
+              <span className={`w-2 h-2 rounded-full ${chromeAiStatus.available ? 'bg-teal-400 animate-pulse' : 'bg-slate-600'}`} />
+            </div>
+            <div className="text-xs font-bold text-white">
+              {chromeAiStatus.available ? 'Chrome AI Active' : 'Standby / Inactive'}
+            </div>
+            <p className="text-[10px] text-slate-500 leading-tight">
+              {chromeAiStatus.available ? chromeAiStatus.model : 'window.ai Prompt API'}
+            </p>
+          </div>
+
+          {/* Badge 2: Firebase AI Logic Cloud */}
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5 transition-all duration-200 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+                <Cloud className="w-3.5 h-3.5 text-blue-400" />
+                Firebase AI Logic
+              </span>
+              <span className={`w-2 h-2 rounded-full ${hasApiKey ? 'bg-blue-400 animate-pulse' : 'bg-amber-400'}`} />
+            </div>
+            <div className="text-xs font-bold text-white">
+              {hasApiKey ? 'Cloud AI Ready' : 'Key Required'}
+            </div>
+            <p className="text-[10px] text-slate-500 leading-tight">
+              Gemini 2.0 / 1.5 Flash
+            </p>
+          </div>
+
+          {/* Badge 3: App Check */}
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5 transition-all duration-200 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-violet-400" />
+                App Check
+              </span>
+              <span className={`w-2 h-2 rounded-full ${hasAppCheckToken ? 'bg-violet-400 animate-pulse' : 'bg-slate-600'}`} />
+            </div>
+            <div className="text-xs font-bold text-white">
+              {hasAppCheckToken ? 'Debug Token Set' : 'Standard Mode'}
+            </div>
+            <p className="text-[10px] text-slate-500 leading-tight">
+              Anti-abuse verification
+            </p>
+          </div>
+
+          {/* Badge 4: Local Heuristic Fallback */}
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5 transition-all duration-200 hover:border-slate-700">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
+                Local Heuristics
+              </span>
+              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+            </div>
+            <div className="text-xs font-bold text-white">
+              100% Operational
+            </div>
+            <p className="text-[10px] text-slate-500 leading-tight">
+              Client-side privacy shield
+            </p>
+          </div>
+        </div>
+      </div>
+
       <form onSubmit={handleSave} className="space-y-6">
         {/* Section 1: AI Inference Configuration */}
         <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-5 transition-all duration-300 hover:border-slate-700">
           <div className="flex items-center gap-2 pb-3 border-b border-slate-800/80 group">
             <Cloud className="w-4 h-4 text-cyan-400 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)]" />
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-              {language === 'ur-roman' ? 'Firebase AI Logic Aur Cloud Configuration' : 'Firebase AI Logic & Cloud Pipeline'}
+              {language === 'ur-roman' ? 'Firebase AI Logic Web App Credentials' : 'Firebase AI Logic & Web App SDK Configuration'}
             </h4>
           </div>
 
@@ -119,11 +233,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          {/* API Key */}
+          {/* Firebase API Key / Gemini Key */}
           <div className="space-y-2 pt-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-mono text-slate-300 font-semibold">
-                {t.geminiApiKeyLabel}
+                Firebase Web API Key (or Gemini API Key)
               </label>
               <span className="text-[10px] font-mono text-slate-500">
                 Client-side encrypted
@@ -132,12 +246,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="relative group">
               <input
                 type={showKey ? 'text' : 'password'}
-                value={formData.geminiApiKey || formData.firebaseApiKey}
+                value={formData.firebaseApiKey || formData.geminiApiKey}
                 onChange={(e) => {
                   setFormData({
                     ...formData,
-                    geminiApiKey: e.target.value,
-                    firebaseApiKey: e.target.value
+                    firebaseApiKey: e.target.value,
+                    geminiApiKey: e.target.value
                   });
                 }}
                 placeholder="AIzaSy..."
@@ -156,36 +270,87 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               </button>
             </div>
             <p className="text-[11px] text-slate-400">
-              {t.geminiApiKeyDesc}
+              Used by Firebase AI Logic (`getAI` / `getGenerativeModel`) and Gemini multimodal endpoints.
             </p>
           </div>
 
-          {/* Optional Project ID */}
+          {/* Firebase Project ID & Auth Domain */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300">
-                {t.firebaseProjectIdLabel} (Optional)
+                Firebase Project ID
               </label>
               <input
                 type="text"
                 value={formData.firebaseProjectId}
                 onChange={(e) => setFormData({ ...formData, firebaseProjectId: e.target.value })}
-                placeholder="scamshield-hackathon"
-                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-600 outline-none transition-all duration-200 focus:shadow-[0_0_12px_rgba(34,211,238,0.2)] font-mono"
+                placeholder="scamshield-ai-hackathon"
+                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-600 outline-none transition font-mono"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300">
-                {t.firebaseAppIdLabel} (Optional)
+                Firebase Auth Domain
+              </label>
+              <input
+                type="text"
+                value={formData.firebaseAuthDomain}
+                onChange={(e) => setFormData({ ...formData, firebaseAuthDomain: e.target.value })}
+                placeholder="scamshield-ai.firebaseapp.com"
+                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-600 outline-none transition font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Firebase App ID & Storage Bucket */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono text-slate-300">
+                Firebase Web App ID
               </label>
               <input
                 type="text"
                 value={formData.firebaseAppId}
                 onChange={(e) => setFormData({ ...formData, firebaseAppId: e.target.value })}
-                placeholder="1:1234567890:web:abcdef"
-                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-600 outline-none transition-all duration-200 focus:shadow-[0_0_12px_rgba(34,211,238,0.2)] font-mono"
+                placeholder="1:1234567890:web:abcdef123456"
+                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-600 outline-none transition font-mono"
               />
             </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono text-slate-300">
+                Storage Bucket
+              </label>
+              <input
+                type="text"
+                value={formData.firebaseStorageBucket || ''}
+                onChange={(e) => setFormData({ ...formData, firebaseStorageBucket: e.target.value })}
+                placeholder="scamshield-ai.firebasestorage.app"
+                className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-600 outline-none transition font-mono"
+              />
+            </div>
+          </div>
+
+          {/* App Check Debug Token */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-mono text-slate-300 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-violet-400" />
+                <span>Firebase App Check Debug Token (Optional)</span>
+              </label>
+              <span className="text-[10px] font-mono text-slate-500">
+                Set "true" for local dev
+              </span>
+            </div>
+            <input
+              type="text"
+              value={formData.firebaseAppCheckDebugToken || ''}
+              onChange={(e) => setFormData({ ...formData, firebaseAppCheckDebugToken: e.target.value })}
+              placeholder='true or 12345678-ABCD-EF01-2345-6789ABCDEF01'
+              className="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-400 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-600 outline-none transition font-mono"
+            />
+            <p className="text-[11px] text-slate-400">
+              Passes App Check verification during local hackathon testing by registering `FIREBASE_APPCHECK_DEBUG_TOKEN`.
+            </p>
           </div>
 
           {/* Test Connection Button & Result */}
@@ -193,21 +358,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <button
               type="button"
               onClick={handleTestConnection}
-              disabled={testStatus.testing}
+              disabled={isTesting}
               className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-cyan-400/50 hover:shadow-[0_0_14px_rgba(34,211,238,0.35)] transition-all duration-200 hover:scale-105 active:scale-98 flex items-center gap-2 cursor-pointer group"
             >
               <Activity className="w-3.5 h-3.5 text-cyan-400 transition-all duration-200 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.65)]" />
-              <span>{testStatus.testing ? t.connectionTesting : t.testConnectionBtn}</span>
+              <span>{isTesting ? 'Testing Firebase AI Logic & App Check...' : 'Test Firebase AI Logic & App Check'}</span>
             </button>
 
-            {testStatus.message && (
-              <div className={`p-2 rounded-lg text-xs font-mono flex items-center gap-2 animate-fade-in ${
+            {testStatus && (
+              <div className={`p-2.5 rounded-lg text-xs font-mono flex items-center gap-2 animate-fade-in ${
                 testStatus.success ? 'bg-teal-500/10 text-teal-300 border border-teal-500/30' : 'bg-red-500/10 text-red-300 border border-red-500/30'
               }`}>
                 {testStatus.success ? (
-                  <Check className="w-3.5 h-3.5 transition-transform duration-200 scale-110 drop-shadow-[0_0_8px_#2DD4BF]" />
+                  <Check className="w-4 h-4 transition-transform duration-200 scale-110 drop-shadow-[0_0_8px_#2DD4BF]" />
                 ) : (
-                  <AlertCircle className="w-3.5 h-3.5 transition-transform duration-200 scale-110 drop-shadow-[0_0_8px_#EF4444]" />
+                  <AlertCircle className="w-4 h-4 transition-transform duration-200 scale-110 drop-shadow-[0_0_8px_#EF4444]" />
                 )}
                 <span>{testStatus.message}</span>
               </div>

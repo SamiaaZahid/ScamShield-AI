@@ -4,11 +4,14 @@ const STORAGE_KEY_HISTORY = 'scamshield_scan_history_v1';
 const STORAGE_KEY_SETTINGS = 'scamshield_settings_v1';
 
 export const DEFAULT_SETTINGS: SettingsConfig = {
-  firebaseApiKey: '',
-  firebaseProjectId: '',
-  firebaseAppId: '',
-  firebaseAuthDomain: '',
-  geminiApiKey: '',
+  firebaseApiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+  firebaseAuthDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  firebaseProjectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
+  firebaseStorageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  firebaseMessagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  firebaseAppId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+  firebaseAppCheckDebugToken: import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN || '',
+  geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY || '',
   preferredEngine: 'hybrid',
   privacyPreMasking: true,
   language: 'en',
@@ -19,7 +22,20 @@ export function loadSettings(): SettingsConfig {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_SETTINGS);
     if (!raw) return DEFAULT_SETTINGS;
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return { 
+      ...DEFAULT_SETTINGS, 
+      ...parsed,
+      // If localStorage values are empty, fallback to env variables if available
+      firebaseApiKey: parsed.firebaseApiKey || DEFAULT_SETTINGS.firebaseApiKey,
+      firebaseAuthDomain: parsed.firebaseAuthDomain || DEFAULT_SETTINGS.firebaseAuthDomain,
+      firebaseProjectId: parsed.firebaseProjectId || DEFAULT_SETTINGS.firebaseProjectId,
+      firebaseStorageBucket: parsed.firebaseStorageBucket || DEFAULT_SETTINGS.firebaseStorageBucket,
+      firebaseMessagingSenderId: parsed.firebaseMessagingSenderId || DEFAULT_SETTINGS.firebaseMessagingSenderId,
+      firebaseAppId: parsed.firebaseAppId || DEFAULT_SETTINGS.firebaseAppId,
+      firebaseAppCheckDebugToken: parsed.firebaseAppCheckDebugToken || DEFAULT_SETTINGS.firebaseAppCheckDebugToken,
+      geminiApiKey: parsed.geminiApiKey || DEFAULT_SETTINGS.geminiApiKey
+    };
   } catch {
     return DEFAULT_SETTINGS;
   }

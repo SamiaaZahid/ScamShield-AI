@@ -2,7 +2,7 @@ import type { ScanResult, SettingsConfig } from '../types';
 import { scrubPii } from './privacyPreScrubber';
 import { analyzeLocally } from './localHeuristicEngine';
 import { analyzeWithChromeAi, checkChromeAiAvailability } from './chromeAiEngine';
-import { analyzeWithFirebaseAi } from './firebaseAiEngine';
+import { analyzeWithFirebaseAi, type FirebaseAiCredentials } from './firebaseAiEngine';
 
 export interface ScanRequest {
   text: string;
@@ -47,12 +47,23 @@ export async function coordinateScan(request: ScanRequest): Promise<{
   const effectiveCloudKey = (settings.geminiApiKey?.trim() || settings.firebaseApiKey?.trim()) ?? '';
 
   if (hasCloudKey) {
+    const creds: FirebaseAiCredentials = {
+      apiKey: effectiveCloudKey,
+      projectId: settings.firebaseProjectId?.trim(),
+      appId: settings.firebaseAppId?.trim(),
+      authDomain: settings.firebaseAuthDomain?.trim(),
+      storageBucket: settings.firebaseStorageBucket?.trim(),
+      messagingSenderId: settings.firebaseMessagingSenderId?.trim(),
+      appCheckDebugToken: settings.firebaseAppCheckDebugToken?.trim()
+    };
+
     try {
       const cloudResult = await analyzeWithFirebaseAi(
         processedText,
         imageDataUrl,
-        effectiveCloudKey,
-        language
+        creds,
+        language,
+        engineMode
       );
       if (imageName) {
         cloudResult.imageName = imageName;

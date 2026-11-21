@@ -50,9 +50,12 @@ export interface ScanResult {
 
 export interface SettingsConfig {
   firebaseApiKey: string;
-  firebaseProjectId: string;
-  firebaseAppId: string;
   firebaseAuthDomain: string;
+  firebaseProjectId: string;
+  firebaseStorageBucket?: string;
+  firebaseMessagingSenderId?: string;
+  firebaseAppId: string;
+  firebaseAppCheckDebugToken?: string;
   geminiApiKey: string;
   preferredEngine: 'hybrid' | 'cloud' | 'local';
   privacyPreMasking: boolean;
